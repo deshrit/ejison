@@ -1,0 +1,9 @@
+services:
+  ejison:
+    build: .
+    image: deshrit/ejison
+    container_name: ejison
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/ejison
