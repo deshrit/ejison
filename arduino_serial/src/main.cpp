@@ -1,8 +1,10 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 
-const uint8_t M1_PIN1 = 8, M1_PIN2 = 9, M1_PIN3 = 10, M1_PIN4 = 11; // Motor 1
-const uint8_t M2_PIN1 = 4, M2_PIN2 = 5, M2_PIN3 = 6, M2_PIN4 = 7; // Motor 2
+# define BUFFER_SIZE 16
+
+const uint8_t M1_PIN1 = 4, M1_PIN2 = 5, M1_PIN3 = 6, M1_PIN4 = 7; // Motor 1
+const uint8_t M2_PIN1 = 8, M2_PIN2 = 9, M2_PIN3 = 10, M2_PIN4 = 11; // Motor 2
 
 const uint8_t STEPS_PER_REVOLUTION = 64; // 28BYJ motor's steps
 const float DEGREE_PER_REVOLUTION = 5.625; // After 64 steps of motor axial moves 5.625 degrees due to gear reduction
@@ -11,55 +13,96 @@ float deg_to_steps(float deg) {
   return (STEPS_PER_REVOLUTION / DEGREE_PER_REVOLUTION) * deg;
 }
 
-AccelStepper motor_right(AccelStepper::FULL4WIRE, M1_PIN1, M1_PIN3, M1_PIN2, M1_PIN4);
-AccelStepper motor_left(AccelStepper::FULL4WIRE, M2_PIN1, M2_PIN3, M2_PIN2, M2_PIN4);
+AccelStepper motor_left(AccelStepper::FULL4WIRE, M1_PIN1, M1_PIN3, M1_PIN2, M1_PIN4);
+AccelStepper motor_right(AccelStepper::FULL4WIRE, M2_PIN1, M2_PIN3, M2_PIN2, M2_PIN4);
 
-/* Command from serial
-* s - stop all
-* l - move left only
-* r - move right only
-* b - move both
+int speed_left = 150, speed_right = 150;
+bool move = false;
+
+/*
+* Serial Commands
+*
+* s: Stop both motors
+* m s1 s2: Run left and right motor with `s1` and `s2` speed respectively (speed range `±300`)
+* c: Continue last speed
+* p: Print current speed
+* 
 */
-char command = 's';
+char command[BUFFER_SIZE];
+uint8_t buffer_index = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!Serial);
 
-  motor_left.setMaxSpeed(1000);
-  motor_left.setSpeed(200);
+  motor_left.setMaxSpeed(300);
+  motor_left.setSpeed(-speed_left);
 
   motor_right.setMaxSpeed(1000);
-  motor_right.setSpeed(-200);
+  motor_right.setSpeed(speed_right);
+}
+
+void process_command(char *command) {
+  switch (command[0]) {
+    case 's':
+      move = false;
+      break;
+
+    case 'c':
+      move = true;
+      break;
+
+    case 'm':
+      if(sscanf(command+1, "%d %d", &speed_left, &speed_right) == 2) {
+        if(speed_left > 300) speed_left = 300;
+        if(speed_left < -300) speed_left = -300;
+        motor_left.setSpeed(-speed_left);
+
+        if(speed_right > 300) speed_right = 300;
+        if(speed_right < -300) speed_right = -300;
+        motor_right.setSpeed(speed_right);
+        move = true;
+      }
+      break;
+    
+    case 'p':
+      Serial.println();
+      Serial.print(speed_left);
+      Serial.print(" ");
+      Serial.println(speed_left);
+      break;
+
+    default:
+      break;
+  }
+}
+
+void read_serial() {
+  while(Serial.available()) {
+    char c = Serial.read();
+    if(c == '\n') {
+      command[buffer_index] = '\0';
+      process_command(command);
+      buffer_index = 0;
+    } else {
+      if(buffer_index < BUFFER_SIZE-1) {
+        command[buffer_index++] = c;
+      }
+    }
+  }
+}
+
+void move_motors() {
+  if(!move) {
+    motor_left.stop();
+    motor_right.stop();
+    return;
+  }
+  motor_left.runSpeed();
+  motor_right.runSpeed();
 }
 
 void loop() {
-
-  if(Serial.available() > 0) {
-    command = Serial.read();
-  }
-
-  switch(command) {
-    case 'l':
-    motor_left.runSpeed();
-    motor_right.stop();
-    break;
-
-    case 'r':
-    motor_right.runSpeed();
-    motor_left.stop();
-    break;
-
-    case 'b':
-    motor_left.runSpeed();
-    motor_right.runSpeed();
-    break;
-
-    case 's':
-    default:
-    motor_left.stop();
-    motor_right.stop();
-    break;
-  }
-
+  read_serial();
+  move_motors();
 }
