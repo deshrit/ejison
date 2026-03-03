@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Colors -->
+    <material name="green">
+        <color rgba="0 1 0 1" />
+    </material>
+
+    <material name="blue">
+        <color rgba="0 0 1 1" />
+    </material>
+
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <material name="brown">
+        <color rgba="0.5 0.3 0 1" />
+    </material>
+
+    <!-- Default Origin -->
+    <xacro:macro name="default_origin">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:macro>
+
+    <!-- Common Material -->
+    <xacro:property name="density" value="1200" />
+
+    <!-- Base Link -->
+    <xacro:property name="body_length" value="0.26" />
+    <xacro:property name="body_breadth" value="0.205" />
+    <xacro:property name="body_height" value="0.005" />
+    <xacro:property name="body_mass" value="${density*body_length*body_breadth*body_height}" />
+
+    <!-- Wheel -->
+    <xacro:property name="wheel_radius" value="0.0325" />
+    <xacro:property name="wheel_length" value="0.025" />
+    <xacro:property name="wheel_mass" value="${pi*wheel_radius*wheel_radius*wheel_length}" />
+
+    <!-- Caster Wheel -->
+    <xacro:property name="caster_wheel_radius" value="0.01625" />
+    <xacro:property name="caster_wheel_mass"
+        value="${(4.0/3.0)*pi*caster_wheel_radius*caster_wheel_radius*caster_wheel_radius}" />
+
+
+    <!-- Camera -->
+    <xacro:property name="camera_length" value="0.07" />
+    <xacro:property name="camera_breadth" value="0.015" />
+    <xacro:property name="camera_height" value="0.025" />
+    <xacro:property name="camera_mass" value="${density*camera_length*camera_breadth*camera_height}" />
+
+
+    <!-- Camera Lens -->
+    <xacro:property name="camera_lens_radius" value="0.009" />
+    <xacro:property name="camera_lens_length" value="0.004" />
+    <xacro:property name="camera_lens_mass"
+        value="${pi*camera_lens_radius*camera_lens_radius*camera_lens_length}" />
+
+
+</robot>

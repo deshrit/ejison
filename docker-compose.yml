@@ -5,5 +5,7 @@ services:
     container_name: ejison
     tty: true
     stdin_open: true
+    user: "${UID}:${GID}"
+    working_dir: /ejison
     volumes:
       - ./:/ejison

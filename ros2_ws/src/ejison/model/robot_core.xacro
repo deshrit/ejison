@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- World -->
+    <link name="base_footprint" />
+    <joint name="base_joint" type="fixed">
+        <parent link="base_footprint" />
+        <child link="base_link" />
+    </joint>
+
+    <!-- Base Link -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${body_length} ${body_breadth} ${body_height}" />
+            </geometry>
+            <xacro:default_origin />
+            <material name="green" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${body_length} ${body_breadth} ${body_height}" />
+            </geometry>
+            <xacro:default_origin />
+        </collision>
+        <inertial>
+            <mass value="${body_mass}" />
+            <xacro:default_origin />
+            <inertia
+                ixx="${(1.0/12.0)*body_mass*(body_breadth*body_breadth + body_height*body_height)}"
+                iyy="${(1.0/12.0)*body_mass*(body_length*body_length + body_height*body_height)}"
+                izz="${(1.0/12.0)*body_mass*(body_length*body_length + body_breadth*body_breadth)}"
+                ixy="0.0"
+                ixz="0.0"
+                iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Wheel Macro -->
+    <xacro:macro name="wheel_macro" params="prefix">
+        <link name="${prefix}_wheel_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+                <material name="brown" />
+            </visual>
+            <collision>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+            </collision>
+            <inertial>
+                <xacro:default_origin />
+                <mass value="${wheel_mass}" />
+                <inertia
+                    ixx="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_length*wheel_length)}"
+                    iyy="${(1.0/2.0)*wheel_mass*wheel_radius*wheel_radius}"
+                    izz="${(1.0/12.0)*wheel_mass*(3*wheel_radius*wheel_radius + wheel_length*wheel_length)}"
+                    ixy="0.0" ixz="0.0" iyz="0.0" />
+            </inertial>
+        </link>
+    </xacro:macro>
+
+
+    <!-- Left Wheel -->
+    <xacro:wheel_macro prefix="left" />
+
+    <!-- Left Wheel Joint -->
+    <joint name="base_left_wheel_joint" type="continuous">
+        <parent link="base_link" />
+        <child link="left_wheel_link" />
+        <origin xyz="-0.08 0.115 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Right Wheel -->
+    <xacro:wheel_macro prefix="right" />
+
+    <!-- Right Wheel Joint -->
+    <joint name="base_right_wheel_joint" type="continuous">
+        <parent link="base_link" />
+        <child link="right_wheel_link" />
+        <origin xyz="-0.08 -0.115 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Caster Wheel -->
+    <link name="caster_wheel_link">
+        <visual>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="brown" />
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+        <inertial>
+            <xacro:default_origin />
+            <mass value="${caster_wheel_mass}" />
+            <inertia
+                ixx="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"
+                iyy="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"
+                izz="${(2.0/5.0)*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"
+                ixy="0.0" ixz="0.0" iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Caster Wheel Joint -->
+    <joint name="base_caster_wheel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="caster_wheel_link" />
+        <origin xyz="0.08 0 -0.01625" rpy="0 0 0" />
+    </joint>
+
+    <!-- Camera -->
+    <link name="camera_link">
+        <visual>
+            <geometry>
+                <box size="${camera_length} ${camera_breadth} ${camera_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${camera_length} ${camera_breadth} ${camera_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+        </collision>
+        <inertial>
+            <xacro:default_origin />
+            <mass value="${camera_mass}" />
+            <inertia
+                ixx="${(1.0/12.0)*camera_mass*(camera_breadth*camera_breadth + camera_height*camera_height)}"
+                iyy="${(1.0/12.0)*camera_mass*(camera_length*camera_length + camera_height*camera_height)}"
+                izz="${(1.0/12.0)*camera_mass*(camera_length*camera_length + camera_breadth*camera_breadth)}"
+                ixy="0.0" ixz="0.0" iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Camera Joint -->
+    <joint name="base_camera_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="camera_link" />
+        <origin xyz="0.1 0 0.0125" rpy="0 0 0" />
+    </joint>
+
+    <!-- Camera Lens -->
+    <link name="camera_lens_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${camera_lens_radius}" length="${camera_lens_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 1.57 0" />
+            <material name="white" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${camera_lens_radius}" length="${camera_lens_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 1.57 0" />
+        </collision>
+        <inertial>
+            <xacro:default_origin />
+            <mass value="${camera_lens_mass}" />
+            <inertia
+                ixx="${(1.0/2.0)*camera_lens_mass*camera_lens_radius*camera_lens_radius}"
+                iyy="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius + camera_lens_length*camera_lens_length)}"
+                izz="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius + camera_lens_length*camera_lens_length)}"
+                ixy="0.0" ixz="0.0" iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Camera Lens Joint -->
+    <joint name="camera_camera_lens_joint" type="fixed">
+        <parent link="camera_link" />
+        <child link="camera_lens_link" />
+        <origin xyz="0.0075 0 0" rpy="0 0 0" />
+    </joint>
+
+</robot>

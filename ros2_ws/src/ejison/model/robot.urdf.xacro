@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ejison">
+
+    <xacro:include filename="$(find ejison)/model/parameters.xacro" />
+
+    <xacro:include filename="$(find ejison)/model/robot_core.xacro" />
+
+    <xacro:include filename="$(find ejison)/model/ros2_control.xacro" />
+
+</robot>
