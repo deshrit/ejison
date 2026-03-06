@@ -10,7 +10,7 @@ Commands to control the motors are:
 
 - `s`: Stop both motors
 
-- `m s1 s2`: Run left and right motor with `s1` and `s2` speed respectively (speed range `±300`)
+- `m s1 s2`: Run left and right motor with `s1` and `s2` speed respectively (range `±300`)
 
 - `c`: Continue last speed
 
