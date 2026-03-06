@@ -62,7 +62,8 @@ To exit: Ctrl + C
     try:
         while True:
             msg = input(">> ")
-            ser.write((msg + "\n").encode())
+            if msg:
+                ser.write((msg + "\n").encode())
     except KeyboardInterrupt:
         pass
 
