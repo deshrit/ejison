@@ -5,44 +5,51 @@ import time
 import serial
 import threading
 
-serial_port = "/dev/ttyACM0"
-baud_rate = 115200
+DEFAULT_SERIAL_PORT = "/dev/ttyACM0"
+DEFAULT_BAUD_RATE = 115200
+VALID_BAUD_RATES = [9600, 19200, 38400, 57600, 115200]
 
-valid_baud_rates = [9600, 19200, 38400, 57600, 115200]
 
-
-def read_serial(ser: serial.Serial):
-    while True:
+def read_serial(ser: serial.Serial, stop_event: threading.Event):
+    while not stop_event.is_set():
         try:
-            if ser.in_waiting > 0:
-                data = ser.readline().decode(errors="ignore").strip()
-                if data:
-                    print(f"\r{data}")
-                    print(">> ", end="", flush=True)
-        except KeyboardInterrupt:
-            break
+            line = ser.readline()
+            if not line:
+                continue
+            text = line.decode(errors="ignore").strip()
+            if text:
+                print(f"\r{text}")
+                print(">> ", end="", flush=True)
+        except serial.SerialException:
+            print("\nSerial disconnected")
+            stop_event.set()
 
 
-def main():
-    global serial_port, baud_rate, valid_baud_rates
+def prase_args():
+    port = DEFAULT_SERIAL_PORT
+    baud_rate = DEFAULT_BAUD_RATE
 
     if len(sys.argv) > 1:
         device = sys.argv[1]
         if not device.startswith("/"):
             print("Invalid device!")
             sys.exit(1)
-        serial_port = device
+        port = device
 
     if len(sys.argv) > 2:
-        if (rate := int(sys.argv[2])) and (rate in valid_baud_rates):
+        try:
+            rate = int(sys.argv[2])
+            if rate not in VALID_BAUD_RATES:
+                raise ValueError
             baud_rate = rate
-        else:
-            print(f"Error baud rates can only be: {valid_baud_rates}")
+        except ValueError:
+            print(f"Error baud rates can only be: {VALID_BAUD_RATES}")
             sys.exit(1)
+    return port, baud_rate
 
-    ser = serial.Serial(serial_port, baud_rate, timeout=3.0)
 
-    print(f"Device: {serial_port}\tBaudrate: {baud_rate}")
+def print_help(port: str, baud_rate: int) -> None:
+    print(f"Device: {port}\tBaud rate: {baud_rate}")
     print("""
 >> s         # Stop both motors
 >> m s1 s2   # Run left and right motor with `s1` and `s2` speed respectively (range `±300`)
@@ -52,20 +59,34 @@ def main():
 To exit: Ctrl + C 
 """)
 
-    # Read serial data
-    rt = threading.Thread(target=read_serial, args=(ser,), daemon=True)
-    rt.start()
 
-    time.sleep(2.0)
+def main():
+    port, baud_rate = prase_args()
 
-    # Write serial data
-    try:
-        while True:
-            msg = input(">> ")
-            if msg:
-                ser.write((msg + "\n").encode())
-    except KeyboardInterrupt:
-        pass
+    stop_event = threading.Event()
+
+    with serial.Serial(port, baud_rate, timeout=0.5) as ser:
+        print_help(port, baud_rate)
+
+        # Read serial data
+        read_thread = threading.Thread(target=read_serial, args=(ser, stop_event))
+        read_thread.start()
+
+        time.sleep(1.0)
+
+        # Write serial data
+        try:
+            while not stop_event.is_set():
+                msg = input(">> ")
+                if msg:
+                    ser.write((msg + "\n").encode())
+        except serial.SerialException as e:
+            print(f"\nSerial error: {e}")
+        except (EOFError, KeyboardInterrupt):
+            print("\nStopping...")
+        finally:
+            stop_event.set()
+            read_thread.join()
 
 
 if __name__ == "__main__":
