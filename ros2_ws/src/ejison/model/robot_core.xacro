@@ -73,7 +73,7 @@
     <joint name="base_left_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="left_wheel_link" />
-        <origin xyz="-0.08 0.115 0" rpy="0 0 0" />
+        <origin xyz="-0.08 ${0.09+wheel_length/2} 0" rpy="0 0 0" />
         <axis xyz="0 1 0" />
     </joint>
 
@@ -84,7 +84,7 @@
     <joint name="base_right_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="right_wheel_link" />
-        <origin xyz="-0.08 -0.115 0" rpy="0 0 0" />
+        <origin xyz="-0.08 -${0.09+wheel_length/2} 0" rpy="0 0 0" />
         <axis xyz="0 1 0" />
     </joint>
 
@@ -121,6 +121,42 @@
         <origin xyz="0.08 0 -0.01625" rpy="0 0 0" />
     </joint>
 
+    <!-- Battery -->
+    <link name="battery_link">
+        <visual>
+            <geometry>
+                <box size="${battery_length} ${battery_breadth} ${battery_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+            <material name="yellow" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${battery_length} ${battery_breadth} ${battery_height}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 1.57" />
+        </collision>
+        <inertial>
+            <mass value="${battery_mass}" />
+            <xacro:default_origin />
+            <inertia
+                ixx="${(1.0/12.0)*battery_mass*(battery_breadth*battery_breadth + battery_height*battery_height)}"
+                iyy="${(1.0/12.0)*battery_mass*(battery_length*battery_length + battery_height*battery_height)}"
+                izz="${(1.0/12.0)*battery_mass*(battery_length*battery_length + battery_breadth*battery_breadth)}"
+                ixy="0.0"
+                ixz="0.0"
+                iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Battery Joint -->
+    <joint name="battery_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="battery_link" />
+        <origin xyz="${body_length/2-0.01-battery_breadth/2} 0 ${body_height+battery_height/2}"
+            rpy="0 0 0" />
+    </joint>
+
     <!-- Camera -->
     <link name="camera_link">
         <visual>
@@ -149,9 +185,9 @@
 
     <!-- Camera Joint -->
     <joint name="base_camera_joint" type="fixed">
-        <parent link="base_link" />
+        <parent link="battery_link" />
         <child link="camera_link" />
-        <origin xyz="0.1 0 0.0125" rpy="0 0 0" />
+        <origin xyz="0 0 ${battery_height/2+camera_height/2}" rpy="0 0 0" />
     </joint>
 
     <!-- Camera Lens -->
@@ -174,8 +210,10 @@
             <mass value="${camera_lens_mass}" />
             <inertia
                 ixx="${(1.0/2.0)*camera_lens_mass*camera_lens_radius*camera_lens_radius}"
-                iyy="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius + camera_lens_length*camera_lens_length)}"
-                izz="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius + camera_lens_length*camera_lens_length)}"
+                iyy="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius +
+    camera_lens_length*camera_lens_length)}"
+                izz="${(1.0/12.0)*camera_lens_mass*(3*camera_lens_radius*camera_lens_radius +
+    camera_lens_length*camera_lens_length)}"
                 ixy="0.0" ixz="0.0" iyz="0.0" />
         </inertial>
     </link>

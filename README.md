@@ -3,7 +3,7 @@
 A monocular SLAM implementation robot with Raspberry Pi and Arduino Uno board with
 28BYJ48 stepper motors.
 
-![ejison-image](assets/imgs/ejison.jpeg)
+![ejison-image](assets/imgs/ejison-redesign.jpeg)
 
 ## Setup and Run ROS2
 
