@@ -1,11 +1,22 @@
 {
-	"folders": [
-		{
-			"path": "arduino_serial"
-		},
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "motor_driver_serial",
+    },
+    {
+      "path": ".",
+    },
+    {
+      "path": "ros2_ws",
+    },
+  ],
+  "settings": {
+    "ROS2.distro": "jazzy",
+    "python.autoComplete.extraPaths": [
+      "/opt/ros/jazzy/lib/python3.12/site-packages",
+    ],
+    "python.analysis.extraPaths": [
+      "/opt/ros/jazzy/lib/python3.12/site-packages",
+    ],
+  },
 }
