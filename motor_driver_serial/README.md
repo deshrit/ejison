@@ -1,6 +1,7 @@
-# Arduino Serial
+# Motor Driver Serial
 
-This library communicates with Arduino Uno board to run two `28BYJ48` 5V stepper motors with `ULN2003` drivers.
+This library communicates with Arduino Uno board to run two `28BYJ-48` 5V stepper 
+motors with `ULN2003` drivers.
 
 # Serial Commands
 

@@ -14,7 +14,8 @@ around 200gm. At first I was also skeptical if these motor could carry robot's w
 with accurate steps but upon testing they seems to perform pretty well. The motors are
 driven by Arduino Uno board which is serially connected to the Raspberry Pi through
 the USB port and commands are first send by the computer to the Arduino board. To
-test driving the motors study the readme of [arduino_comm](/arduino_comm) sub-project.
+test driving the motors study the README.md of 
+[motor_driver_serial_tester](/motor_driver_serial_tester) sub-project.
 
 The camera is connected to the computer through USB. It is an old Pelomax 
 (PCW-380) with USB 1.1 and VGA (640x480) resolution that I had laying around.

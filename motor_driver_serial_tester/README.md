@@ -1,6 +1,6 @@
-# Arduino comm
+# Motor Driver Serial Tester
 
-Simple python cli program to test communications with arduino to control two `28BYJ48`
+Simple python cli program to test communications with arduino to control two `28BYJ-48`
 motors.
 
 # To run the program
