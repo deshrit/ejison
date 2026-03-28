@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- <gazebo reference="left_wheel_link">
+        <material>Gazebo/Green</material>
+    </gazebo> -->
+
+    <plugin filename="gz-sim-joint-state-publisher-system"
+        name="gz::sim::systems::JointStatePublisher">
+        <update_rate>20</update_rate>
+    </plugin>
+
+</robot>

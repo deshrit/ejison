@@ -1,0 +1,2 @@
+float64 left_step_rate
+float64 right_step_rate

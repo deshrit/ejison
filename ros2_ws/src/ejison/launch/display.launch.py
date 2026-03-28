@@ -1,11 +1,13 @@
 import os
 import xacro
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import PathJoinSubstitution
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 
 package_name = "ejison"
 xacro_model_relative = "model/robot.urdf.xacro"
@@ -18,6 +20,7 @@ def generate_launch_description():
     robot_des_xml = xacro.process_file(xacro_model_path).toxml()
     params = {
         "robot_description": robot_des_xml,
+        "use_sim_time": True,
     }
 
     declared_arguments = []
@@ -35,11 +38,6 @@ def generate_launch_description():
             description="Start robot with mock hardware mirroring command to its states.",
         )
     )
-
-    # joint_state_publisher_gui = Node(
-    #     package="joint_state_publisher_gui",
-    #     executable="joint_state_publisher_gui",
-    # )
 
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
@@ -77,19 +75,27 @@ def generate_launch_description():
         arguments=["-d", rviz_config_path],
     )
 
-    # gz_desc = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"],
-    #     ),
-    #     launch_arguments=[("gz_args", "empty.sdf")],
-    # )
+    gz_desc = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"],
+        ),
+        launch_arguments=[("gz_args", "-r v4 empty.sdf"), ("on_exit_shutdown", "true")],
+    )
+
+    spawn_robot_node = Node(
+        package="ros_gz_sim",
+        executable="create",
+        arguments=["-name", "ejison", "-topic", "/robot_description"],
+    )
 
     return LaunchDescription(
         [
             robot_state_publisher_node,
             robot_controller_spawner,
             joint_state_broadcaster_node,
-            controller_node,
+            # controller_node,
             rviz_node,
+            gz_desc,
+            spawn_robot_node,
         ]
     )

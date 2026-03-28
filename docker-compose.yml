@@ -5,7 +5,12 @@ services:
     container_name: ejison
     tty: true
     stdin_open: true
-    user: "${UID}:${GID}"
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    network_mode: host
+    ipc: host
+    devices:
+      - ${CAMERA_DEVICE:-/dev/video0}:/dev/video0
+      - ${SERIAL_DEVICE:-/dev/ttyACM0}:/dev/ttyACM0
     working_dir: /ejison
     volumes:
       - ./:/ejison
