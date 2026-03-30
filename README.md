@@ -25,11 +25,11 @@ resolution.
 
 ## Setup and Run ROS2
 
-In my dev machine, I used [ros-jazzy](https://docs.ros.org/en/jazzy/index.html)
-natively running Ubuntu Noble 24.04 OS but in the robot computer 
-lite raspberry pi OS was used and the whole robot os was replicated as a single docker 
-container with [ros:jazzy-ros-base](https://hub.docker.com/layers/library/ros/jazzy-ros-base/images/sha256-3f3434e8c66b35b4362d43b3c68d4debb705121fc5f16e850b6174f3c304be60) image as the
-base. Run the following commands to setup and run:
+All of the development was done in Ubuntu Noble 24.04 dev machine with 
+[ros-jazzy](https://docs.ros.org/en/jazzy/index.html) running natively but in the robot 
+computer raspberry pi lite OS was used and the whole system was replicated as a single 
+docker container with [ros:jazzy-ros-base](https://hub.docker.com/layers/library/ros/jazzy-ros-base/images/sha256-3f3434e8c66b35b4362d43b3c68d4debb705121fc5f16e850b6174f3c304be60) image. Run 
+the following commands to setup and get started:
 
 ```bash
 docker compose up -d
