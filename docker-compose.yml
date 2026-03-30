@@ -11,6 +11,9 @@ services:
     devices:
       - ${CAMERA_DEVICE:-/dev/video0}:/dev/video0
       - ${SERIAL_DEVICE:-/dev/ttyACM0}:/dev/ttyACM0
+    group_add:
+      - video
+      - dialout
     working_dir: /ejison
     volumes:
       - ./:/ejison
