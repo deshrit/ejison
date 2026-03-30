@@ -14,12 +14,12 @@ setup(
         (
             # Launch files
             os.path.join("share", package_name, "launch"),
-            glob(os.path.join("launch/*")),
+            glob("launch/*"),
         ),
         (
             # Model files
             os.path.join("share", package_name, "model"),
-            glob(os.path.join("model", "*.xacro")),
+            glob("model/*"),
         ),
         (
             # Config files
@@ -39,6 +39,8 @@ setup(
         ],
     },
     entry_points={
-        "console_scripts": [],
+        "console_scripts": [
+            "cam = ejison.cam:main",
+        ],
     },
 )
