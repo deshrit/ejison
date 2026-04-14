@@ -6,7 +6,7 @@ from core.msg import StepperCommand
 
 WHEEL_RADIUS = 0.0325
 WHEEL_BASE = 0.18
-STEPS_PER_REV = 2048  # 28BYJ48
+STEPS_PER_REV = 2048  # 28BYJ-48 motor
 
 
 class MotorDriver(Node):
@@ -16,10 +16,15 @@ class MotorDriver(Node):
             Twist, "/cmd_vel", self.command_callback, 10
         )
         self.publisher = self.create_publisher(StepperCommand, "/stepper_command", 10)
+        self.logger = self.get_logger()
+
+        self.logger.info("Motor driver initialized")
 
     def command_callback(self, msg: Twist):
         v = msg.linear.x
         w = msg.angular.z
+
+        self.logger.info(f"Twist message x: {v}, z: {w}")
 
         left_vel = v - w * WHEEL_BASE / 2
         right_vel = v + w * WHEEL_BASE / 2
@@ -36,4 +41,7 @@ class MotorDriver(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    motor_driver = MotorDriver()
+    rclpy.spin(motor_driver)
+    motor_driver.destroy_node()
     rclpy.shutdown()

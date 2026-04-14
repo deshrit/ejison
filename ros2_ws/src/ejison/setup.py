@@ -41,6 +41,8 @@ setup(
     entry_points={
         "console_scripts": [
             "cam = ejison.cam:main",
+            "motor_driver = ejison.motor_driver:main",
+            "serial_bridge = ejison.serial_bridge:main",
         ],
     },
 )

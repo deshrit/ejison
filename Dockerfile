@@ -1,4 +1,5 @@
-FROM arm64v8/ros:jazzy-ros-base
+# FROM arm64v8/ros:jazzy-ros-base
+FROM ros:jazzy-ros-base
 
 
 RUN apt update && apt install -y --no-install-recommends \
@@ -10,6 +11,6 @@ RUN apt update && apt install -y --no-install-recommends \
 RUN apt update && apt install -y \
     ros-jazzy-demo-nodes-cpp \
     ros-jazzy-cv-bridge \
-    v4l-utils \
+    ros-jazzy-image-transport-plugins \
     && rm -rf /var/lib/apt/lists/*
 

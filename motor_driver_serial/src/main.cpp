@@ -19,6 +19,10 @@ AccelStepper motor_right(AccelStepper::FULL4WIRE, M2_PIN1, M2_PIN3, M2_PIN2, M2_
 int speed_left = 150, speed_right = 150;
 bool move = false;
 
+const int PUBLISH_INTERVAL_MS = 100;
+unsigned long last_publish = 0;
+bool publish = false;
+
 long last_left_steps = 0, last_right_steps = 0;
 
 /*
@@ -58,6 +62,7 @@ void process_command(char *command) {
   switch (command[0]) {
     case 's':
       move = false;
+      publish = false;
       break;
 
     case 'c':
@@ -80,6 +85,7 @@ void process_command(char *command) {
       break;
 
     case 'd':
+      publish = true;
       if(sscanf(command+1, "%d %d", &speed_left, &speed_right) == 2) {
         if(speed_left > 300) speed_left = 300;
         if(speed_left < -300) speed_left = -300;
@@ -153,10 +159,13 @@ void update_steps()
 }
 
 void publish_steps() {
-  if(command[0] == 'd') {
+  if(!publish) return;
+  unsigned long now = millis();
+  if(now - last_publish >= PUBLISH_INTERVAL_MS) {
+    last_publish = now;
     Serial.print(last_left_steps);
     Serial.print(" ");
-    Serial.println(last_left_steps);
+    Serial.println(last_right_steps);
   }
 }
 
@@ -167,3 +176,38 @@ void loop() {
   update_steps();
   publish_steps();
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// #include <Arduino.h>
+
+// #define BUFFER_SIZE 32
+
+// char command[BUFFER_SIZE] = "default";
+// uint8_t buffer_index = 0;
+
+// void read_serial() {
+//   while(Serial.available()) {
+//     char c = Serial.read();
+//     if(c == '\n') {
+//       command[buffer_index] = '\0';
+//       buffer_index = 0;
+//     } else {
+//       if(buffer_index < BUFFER_SIZE-1) {
+//         command[buffer_index++] = c;
+//       }
+//     }
+//   }
+// }
+
+
+// void setup() {
+//   Serial.begin(115200);
+// }
+
+// void loop() {
+//   read_serial();
+//   Serial.println(command);
+//   delay(100);
+// }
